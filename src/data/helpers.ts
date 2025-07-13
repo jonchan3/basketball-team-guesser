@@ -64,25 +64,78 @@ export function isYearInSeasonRange(inputYear: string, targetSeason: string, ran
  */
 export function normalizeSeason(season: string): string {
   if (!season) return '';
-  // Remove all spaces and normalize to YYYY-YY format
-  let normalized = season.replace(/\s/g, '').trim();
   
-  // Handle full 4-digit year format (e.g., "2019-2020" -> "2019-20")
-  const fullYearMatch = normalized.match(/^(\d{4})-(\d{4})$/);
-  if (fullYearMatch) {
-    const startYear = fullYearMatch[1];
-    const endYear = fullYearMatch[2].slice(-2); // Take last 2 digits
-    normalized = `${startYear}-${endYear}`;
+  // First, trim and clean up the input
+  const cleaned = season.trim().toLowerCase();
+  
+  // Handle single year inputs (e.g., "2004" for 2003-04 season)
+  const singleYearMatch = cleaned.match(/^\s*(\d{4})\s*$/);
+  if (singleYearMatch) {
+    const year = parseInt(singleYearMatch[1]);
+    // Convert single year to season format (e.g., 2004 -> 2003-04)
+    const prevYear = year - 1;
+    const yearSuffix = year.toString().slice(-2);
+    return `${prevYear}-${yearSuffix}`;
   }
   
-  // Handle mixed formats (e.g., "2019-20" is already correct, but ensure consistency)
-  const mixedMatch = normalized.match(/^(\d{4})-(\d{2})$/);
-  if (mixedMatch) {
-    // Already in correct format, keep as is
-    normalized = `${mixedMatch[1]}-${mixedMatch[2]}`;
+  // Handle various dash/hyphen formats with potential spaces
+  // This regex captures: YYYY-YYYY, YYYY-YY, with optional spaces around dash
+  const seasonMatch = cleaned.match(/^\s*(\d{4})\s*[-–—]\s*(\d{2,4})\s*$/);
+  if (seasonMatch) {
+    const startYear = parseInt(seasonMatch[1]);
+    let endYearStr = seasonMatch[2];
+    
+    // If end year is 4 digits, take last 2 digits
+    if (endYearStr.length === 4) {
+      endYearStr = endYearStr.slice(-2);
+    }
+    
+    // Ensure end year is 2 digits and makes sense
+    const endYear = parseInt(endYearStr);
+    if (endYear >= 0 && endYear <= 99) {
+      // Format as YYYY-YY
+      return `${startYear}-${endYearStr.padStart(2, '0')}`;
+    }
   }
   
-  return normalized;
+  // Handle slash formats (e.g., "2003/04", "2003/2004")
+  const slashMatch = cleaned.match(/^\s*(\d{4})\s*[\/]\s*(\d{2,4})\s*$/);
+  if (slashMatch) {
+    const startYear = parseInt(slashMatch[1]);
+    let endYearStr = slashMatch[2];
+    
+    // If end year is 4 digits, take last 2 digits
+    if (endYearStr.length === 4) {
+      endYearStr = endYearStr.slice(-2);
+    }
+    
+    // Format as YYYY-YY
+    return `${startYear}-${endYearStr.padStart(2, '0')}`;
+  }
+  
+  // Handle space-separated formats (e.g., "2003 04", "2003 2004")
+  const spaceMatch = cleaned.match(/^\s*(\d{4})\s+(\d{2,4})\s*$/);
+  if (spaceMatch) {
+    const startYear = parseInt(spaceMatch[1]);
+    let endYearStr = spaceMatch[2];
+    
+    // If end year is 4 digits, take last 2 digits
+    if (endYearStr.length === 4) {
+      endYearStr = endYearStr.slice(-2);
+    }
+    
+    // Format as YYYY-YY
+    return `${startYear}-${endYearStr.padStart(2, '0')}`;
+  }
+  
+  // If already in correct format, return as is
+  const correctFormatMatch = cleaned.match(/^\s*(\d{4})-(\d{2})\s*$/);
+  if (correctFormatMatch) {
+    return `${correctFormatMatch[1]}-${correctFormatMatch[2]}`;
+  }
+  
+  // If no match found, return original cleaned input (remove spaces)
+  return cleaned.replace(/\s+/g, '');
 }
 
 /**

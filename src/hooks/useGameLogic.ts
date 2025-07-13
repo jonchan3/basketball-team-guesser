@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { GameState, UserProfile } from '../types/game';
 import { getRandomTeamAndRecord } from '../data/basketball-data';
-import { getSeasonYearRangeHint, isYearInSeasonRange, normalizeSeason } from '../data/helpers';
+import { normalizeSeason } from '../data/helpers';
 
 const INITIAL_GAME_STATE: GameState = {
   currentTeam: null,
@@ -99,43 +99,65 @@ export function useGameLogic() {
     // Track correct answers
     const correctAnswers = {
       wins: wins !== null && wins === currentRecord.wins,
-      season: season !== null && (
-        normalizeSeason(season) === normalizeSeason(currentRecord.season) ||
-        isYearInSeasonRange(season, currentRecord.season)
-      ),
+      season: season !== null && normalizeSeason(season) === normalizeSeason(currentRecord.season),
       teamName: teamName === currentTeam?.name,
       playoffResult: playoffResult === currentRecord.playoffResult,
     };
 
-    // Count correct answers and calculate score
+    // Only add points for newly correct answers (not already submitted as correct)
+    const newlyCorrect = {
+      wins: correctAnswers.wins && !gameState.submitted.wins,
+      season: correctAnswers.season && !gameState.submitted.season,
+      teamName: correctAnswers.teamName && !gameState.submitted.teamName,
+      playoffResult: correctAnswers.playoffResult && !gameState.submitted.playoffResult,
+    };
+
+    // Count newly correct answers and calculate score
+    Object.values(newlyCorrect).forEach(isNewlyCorrect => {
+      if (isNewlyCorrect) {
+        score += 25;
+      }
+    });
+
+    // Count total correct answers for game completion check
     Object.values(correctAnswers).forEach(isCorrect => {
       if (isCorrect) {
-        score += 25;
         correct++;
       }
     });
 
-    // Update submitted status for all fields
-    const newSubmitted = {
-      wins: true,
-      season: true,
-      teamName: true,
-      playoffResult: true,
-    };
+    // Always update score and allow continued play
+    const newScore = gameState.score + score;
+    setGameState(prev => ({
+      ...prev,
+      score: newScore,
+      submitted: {
+        // Mark as submitted if we have a guess for this field (regardless of correctness)
+        wins: wins !== null || prev.submitted.wins,
+        season: season !== null || prev.submitted.season,
+        teamName: teamName !== null || prev.submitted.teamName,
+        playoffResult: playoffResult !== null || prev.submitted.playoffResult,
+      },
+      // Clear incorrect guesses so player can try again, but keep correct ones
+      guesses: {
+        wins: correctAnswers.wins ? prev.guesses.wins : null,
+        season: correctAnswers.season ? prev.guesses.season : null,
+        teamName: correctAnswers.teamName ? prev.guesses.teamName : null,
+        playoffResult: correctAnswers.playoffResult ? prev.guesses.playoffResult : null,
+      },
+    }));
 
-    // Only end the game if all answers are correct
+    // Only end the game and show results if all answers are correct
     if (correct === totalGuesses) {
       // Bonus for perfect score
-      score += 50;
-      
+      const bonusScore = 50;
+      const finalScore = newScore + bonusScore;
       const newStreak = gameState.streak + 1;
-      const newScore = gameState.score + score;
 
       setGameState(prev => ({
         ...prev,
-        score: newScore,
+        score: finalScore,
         streak: newStreak,
-        submitted: newSubmitted,
       }));
 
       // Update user profile
@@ -143,25 +165,10 @@ export function useGameLogic() {
         ...prev,
         gamesPlayed: prev.gamesPlayed + 1,
         bestStreak: Math.max(prev.bestStreak, newStreak),
-        totalScore: prev.totalScore + score,
+        totalScore: prev.totalScore + finalScore,
       }));
 
       setShowResults(true);
-    } else {
-      // If not all correct, update score and submitted status but continue the game
-      const newScore = gameState.score + score;
-      setGameState(prev => ({
-        ...prev,
-        score: newScore,
-        submitted: newSubmitted,
-        // Clear incorrect guesses so player can try again
-        guesses: {
-          wins: correctAnswers.wins ? prev.guesses.wins : null,
-          season: correctAnswers.season ? prev.guesses.season : null,
-          teamName: correctAnswers.teamName ? prev.guesses.teamName : null,
-          playoffResult: correctAnswers.playoffResult ? prev.guesses.playoffResult : null,
-        },
-      }));
     }
   };
 
@@ -182,8 +189,23 @@ export function useGameLogic() {
         hintValue = `${minWins}-${maxWins}`;
         break;
       case 'season':
-        // Provide a year range hint instead of exact season
-        hintValue = getSeasonYearRangeHint(currentRecord.season, 2);
+        // Provide a smaller, more precise year range hint
+        const seasonYear = currentRecord.season;
+        const seasonMatch = seasonYear.match(/^(\d{4})-(\d{2})$/);
+        if (seasonMatch) {
+          const startYear = parseInt(seasonMatch[1]);
+          const rangeSize = 3; // ±3 years range
+          const minYear = startYear - rangeSize;
+          const maxYear = startYear + rangeSize;
+          hintValue = `${minYear}-${maxYear} (format: YYYY-YY)`;
+        } else {
+          // For single year seasons
+          const year = parseInt(seasonYear);
+          const rangeSize = 3; // ±3 years range
+          const minYear = year - rangeSize;
+          const maxYear = year + rangeSize;
+          hintValue = `${minYear}-${maxYear}`;
+        }
         break;
       case 'teamName':
         hintValue = currentTeam.name;

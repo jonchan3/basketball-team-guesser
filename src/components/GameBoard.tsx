@@ -5,7 +5,7 @@ import { Trophy, Zap, Target, Award, Clock, Users } from 'lucide-react';
 import { useGameLogic } from '../hooks/useGameLogic';
 import { BASKETBALL_TEAMS } from '../data/basketball-data';
 import { PlayoffResult, Player, GameState } from '../types/game';
-import { normalizeSeason, isYearInSeasonRange } from '../data/helpers';
+import { normalizeSeason } from '../data/helpers';
 
 const PLAYOFF_RESULTS: PlayoffResult[] = [
   'Did not make playoffs',
@@ -101,10 +101,7 @@ export default function GameBoard() {
     
     return {
       wins: wins !== null && wins === currentRecord.wins,
-      season: season !== null && (
-        normalizeSeason(season) === normalizeSeason(currentRecord.season) ||
-        isYearInSeasonRange(season, currentRecord.season)
-      ),
+      season: season !== null && normalizeSeason(season) === normalizeSeason(currentRecord.season),
       teamName: teamName === currentTeam.name,
       playoffResult: playoffResult === currentRecord.playoffResult,
     };
@@ -132,8 +129,9 @@ export default function GameBoard() {
   };
 
   const isGameActive = () => {
-    const { submitted } = gameState;
-    return !(submitted.wins && submitted.season && submitted.teamName && submitted.playoffResult);
+    // Game is active until all answers are correct AND have been submitted together in a final submission
+    // This allows the final submission even when all individual answers are correct
+    return !showResults;
   };
 
   return (
