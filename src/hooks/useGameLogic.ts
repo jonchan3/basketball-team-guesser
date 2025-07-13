@@ -77,13 +77,45 @@ export function useGameLogic() {
   };
 
   const makeGuess = (type: keyof GameState['guesses'], value: string | number | null) => {
-    setGameState(prev => ({
-      ...prev,
-      guesses: {
-        ...prev.guesses,
-        [type]: value,
-      },
-    }));
+    setGameState(prev => {
+      // Check if this field was previously submitted and wrong
+      let wasSubmittedAndWrong = false;
+      if (prev.submitted[type as keyof GameState['submitted']] && prev.currentRecord && prev.currentTeam) {
+        // Check if the previous guess was wrong
+        const prevGuess = prev.guesses[type];
+        if (prevGuess !== null) {
+          let wasCorrect = false;
+          switch (type) {
+            case 'wins':
+              wasCorrect = prevGuess === prev.currentRecord.wins;
+              break;
+            case 'season':
+              wasCorrect = normalizeSeason(prevGuess as string) === normalizeSeason(prev.currentRecord.season);
+              break;
+            case 'teamName':
+              wasCorrect = prevGuess === prev.currentTeam.name;
+              break;
+            case 'playoffResult':
+              wasCorrect = prevGuess === prev.currentRecord.playoffResult;
+              break;
+          }
+          wasSubmittedAndWrong = !wasCorrect;
+        }
+      }
+      
+      return {
+        ...prev,
+        guesses: {
+          ...prev.guesses,
+          [type]: value,
+        },
+        // Reset submitted state for this field if it was wrong and user is typing new answer
+        submitted: wasSubmittedAndWrong ? {
+          ...prev.submitted,
+          [type]: false,
+        } : prev.submitted,
+      };
+    });
   };
 
   const submitGuesses = () => {
@@ -132,11 +164,11 @@ export function useGameLogic() {
       ...prev,
       score: newScore,
       submitted: {
-        // Mark as submitted if we have a guess for this field (regardless of correctness)
-        wins: wins !== null || prev.submitted.wins,
-        season: season !== null || prev.submitted.season,
-        teamName: teamName !== null || prev.submitted.teamName,
-        playoffResult: playoffResult !== null || prev.submitted.playoffResult,
+        // Mark as submitted for all fields that had guesses, regardless of correctness
+        wins: wins !== null ? true : prev.submitted.wins,
+        season: season !== null ? true : prev.submitted.season,
+        teamName: teamName !== null ? true : prev.submitted.teamName,
+        playoffResult: playoffResult !== null ? true : prev.submitted.playoffResult,
       },
       // Clear incorrect guesses so player can try again, but keep correct ones
       guesses: {
