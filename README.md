@@ -1,6 +1,16 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Basketball Team Guesser
 
-## Getting Started
+A modern, interactive basketball trivia game where players guess information about professional basketball teams including wins, seasons, team names, and playoff results. Built with Next.js 15, TypeScript, and Tailwind CSS.
+
+## 🏀 Features
+
+- **Guess Basketball Team Stats**: Predict wins, season, team name, and playoff results
+- **Scoring System**: Earn points for correct guesses with bonus for perfect rounds
+- **Hint System**: Use hints to help with difficult guesses (3 hints per game)
+- **Responsive Design**: Beautiful UI that works on all devices
+- **Local Storage**: Game progress and user profiles saved locally
+
+## 🚀 Getting Started
 
 First, run the development server:
 
@@ -10,27 +20,67 @@ npm run dev
 yarn dev
 # or
 pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🎮 How to Play
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. **Start a New Game**: Click "Start New Game" to begin
+2. **Make Your Guesses**: 
+   - Enter the number of regular season wins (0-82)
+   - Select the season (e.g., 2019-20)
+   - Choose the team name from the dropdown
+   - Pick how far they made it in the playoffs
+3. **Use Hints**: Click "Use Hint" buttons to reveal answers (3 hints per game)
+4. **Submit**: Click "Submit Guesses" when ready
+5. **View Results**: See how you did and your score
 
-## Learn More
+## 🛠️ Tech Stack
 
-To learn more about Next.js, take a look at the following resources:
+- **Framework**: Next.js 15 with App Router
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **Icons**: Lucide React
+- **State Management**: React hooks
+- **Data Storage**: Local Storage
+- **Package Manager**: npm
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 📁 Project Structure
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```
+src/
+├── app/                 # Next.js app directory
+│   ├── layout.tsx      # Root layout
+│   ├── page.tsx        # Home page
+│   └── globals.css     # Global styles
+├── components/         # React components
+│   └── GameBoard.tsx   # Main game component
+├── data/              # Game data
+│   └── basketball-data.ts    # Basketball teams and records
+├── hooks/             # Custom React hooks
+│   └── useGameLogic.ts # Game logic hook
+└── types/             # TypeScript type definitions
+    └── game.ts        # Game-related types
+```
 
-## Deploy on Vercel
+## 🏆 Game Scoring
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- **Wins Guess**: 25 points (within ±3 wins of actual)
+- **Season Guess**: 25 points (exact match)
+- **Team Name**: 25 points (exact match)
+- **Playoff Result**: 25 points (exact match)
+- **Perfect Round Bonus**: +50 points
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 🔮 Future Features
+
+- Player roster hints
+- More professional basketball teams and historical data
+- Multiplayer competitions
+- Leaderboards
+- Social sharing
+- Mobile app version
+
+## 📄 License
+
+This project is for educational and demonstration purposes.
