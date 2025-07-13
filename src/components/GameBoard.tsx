@@ -142,7 +142,7 @@ export default function GameBoard() {
       <div className="bg-gradient-to-r from-orange-600 to-red-600 shadow-lg court-floor">
         <div className="max-w-4xl mx-auto p-6 flex justify-between items-center">
           <div className="flex items-center space-x-3">
-            <h1 className="text-2xl font-bold text-white">🏀 Basketball Team Guesser</h1>
+            <h1 className="text-2xl font-bold text-white">🏀 Legends Lineups</h1>
           </div>
           <div className="flex items-center space-x-6 bg-black/40 px-4 py-2 rounded-lg scoreboard-glow">
             <div className="text-center">
