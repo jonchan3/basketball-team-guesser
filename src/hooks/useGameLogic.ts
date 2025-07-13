@@ -225,6 +225,40 @@ export function useGameLogic() {
     }));
   };
 
+  const giveUp = () => {
+    if (!gameState.currentRecord || !gameState.currentTeam) return;
+
+    // Reset streak since player gave up
+    const newStreak = 0;
+
+    setGameState(prev => ({
+      ...prev,
+      streak: newStreak,
+      submitted: {
+        wins: true,
+        season: true,
+        teamName: true,
+        playoffResult: true,
+      },
+      // Reveal all correct answers
+      guesses: {
+        wins: prev.currentRecord?.wins || null,
+        season: prev.currentRecord?.season || null,
+        teamName: prev.currentTeam?.name || null,
+        playoffResult: prev.currentRecord?.playoffResult || null,
+      },
+    }));
+
+    // Update user profile - count as a game played but with 0 score
+    setUserProfile(prev => ({
+      ...prev,
+      gamesPlayed: prev.gamesPlayed + 1,
+      bestStreak: prev.bestStreak, // Don't update best streak when giving up
+    }));
+
+    setShowResults(true);
+  };
+
   return {
     gameState,
     userProfile,
@@ -234,5 +268,6 @@ export function useGameLogic() {
     makeGuess,
     submitGuesses,
     showHint,
+    giveUp,
   };
 }

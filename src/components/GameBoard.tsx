@@ -25,6 +25,7 @@ export default function GameBoard() {
     makeGuess,
     submitGuesses,
     showHint,
+    giveUp,
   } = useGameLogic();
 
   // State for dynamically displayed players
@@ -128,6 +129,11 @@ export default function GameBoard() {
         </div>
       );
     }
+  };
+
+  const isGameActive = () => {
+    const { submitted } = gameState;
+    return !(submitted.wins && submitted.season && submitted.teamName && submitted.playoffResult);
   };
 
   return (
@@ -439,16 +445,27 @@ export default function GameBoard() {
               </div>
             </div>
 
-            {/* Submit Button */}
-            <div className="text-center">
-              <button
-                onClick={submitGuesses}
-                disabled={!isGuessComplete()}
-                className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 disabled:from-gray-500 disabled:to-gray-600 disabled:cursor-not-allowed text-white font-bold py-4 px-8 rounded-lg text-xl transition-all duration-300 transform hover:scale-105 disabled:scale-100 shadow-lg"
-              >
-                🏀 Submit Guesses
-              </button>
-            </div>
+            {/* Submit and Give Up Buttons */}
+            {isGameActive() && (
+              <div className="text-center space-y-4">
+                <button
+                  onClick={submitGuesses}
+                  disabled={!isGuessComplete()}
+                  className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 disabled:from-gray-500 disabled:to-gray-600 disabled:cursor-not-allowed text-white font-bold py-4 px-8 rounded-lg text-xl transition-all duration-300 transform hover:scale-105 disabled:scale-100 shadow-lg"
+                >
+                  🏀 Submit Guesses
+                </button>
+                
+                <div className="text-sm text-gray-400">or</div>
+                
+                <button
+                  onClick={giveUp}
+                  className="bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white font-bold py-3 px-6 rounded-lg text-lg transition-all duration-300 transform hover:scale-105 shadow-lg"
+                >
+                  🏳️ Give Up & See Answer
+                </button>
+              </div>
+            )}
           </div>
         )}
       </div>
