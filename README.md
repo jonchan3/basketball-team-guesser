@@ -10,19 +10,6 @@ A modern, interactive basketball trivia game where players guess information abo
 - **Responsive Design**: Beautiful UI that works on all devices
 - **Local Storage**: Game progress and user profiles saved locally
 
-## 🚀 Getting Started
-
-First, run the development server:
-
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 ## 🎮 How to Play
 
@@ -46,23 +33,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 - **Data Storage**: Local Storage
 - **Package Manager**: npm
 
-## 📁 Project Structure
 
-```
-src/
-├── app/                 # Next.js app directory
-│   ├── layout.tsx      # Root layout
-│   ├── page.tsx        # Home page
-│   └── globals.css     # Global styles
-├── components/         # React components
-│   └── GameBoard.tsx   # Main game component
-├── data/              # Game data
-│   └── basketball-data.ts    # Basketball teams and records
-├── hooks/             # Custom React hooks
-│   └── useGameLogic.ts # Game logic hook
-└── types/             # TypeScript type definitions
-    └── game.ts        # Game-related types
-```
 
 ## 🏆 Game Scoring
 
@@ -72,14 +43,7 @@ src/
 - **Playoff Result**: 25 points (exact match)
 - **Perfect Round Bonus**: +50 points
 
-## 🔮 Future Features
 
-- Player roster hints
-- More professional basketball teams and historical data
-- Multiplayer competitions
-- Leaderboards
-- Social sharing
-- Mobile app version
 
 ## 📄 License
 
