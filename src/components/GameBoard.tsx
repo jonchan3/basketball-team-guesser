@@ -164,6 +164,12 @@ export default function GameBoard() {
                 {gameState.hintsRemaining}
               </div>
             </div>
+            <div className="text-center">
+              <div className="text-sm text-orange-200">Attempts</div>
+              <div className="text-xl font-bold text-red-400 flex items-center">
+                🎯 {gameState.submissionAttempts}/5
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -247,6 +253,13 @@ export default function GameBoard() {
             <div className="text-center">
               <h2 className="text-3xl font-bold mb-2 text-orange-200">🏀 Guess This Team&apos;s Season!</h2>
               <p className="text-orange-300">Study the clues and make your best guesses about this basketball team&apos;s performance</p>
+              {gameState.submissionAttempts >= 3 && gameState.submissionAttempts < 5 && (
+                <div className="mt-4 p-3 bg-red-900/50 border border-red-500/50 rounded-lg">
+                  <p className="text-red-200 font-bold">
+                    ⚠️ Warning: {5 - gameState.submissionAttempts} attempt{5 - gameState.submissionAttempts === 1 ? '' : 's'} remaining before answers are revealed!
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* Team Clues */}

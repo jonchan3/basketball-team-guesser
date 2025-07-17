@@ -61,6 +61,7 @@ export interface GameState {
   streak: number;
   hintsUsed: number;
   hintsRemaining: number;
+  submissionAttempts: number;
 }
 
 export interface UserProfile {

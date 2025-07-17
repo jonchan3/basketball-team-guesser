@@ -31,6 +31,7 @@ const INITIAL_GAME_STATE: GameState = {
   streak: 0,
   hintsUsed: 0,
   hintsRemaining: 3,
+  submissionAttempts: 0,
 };
 
 const INITIAL_USER_PROFILE: UserProfile = {
@@ -158,11 +159,15 @@ export function useGameLogic() {
       }
     });
 
+    // Increment submission attempts
+    const newSubmissionAttempts = gameState.submissionAttempts + 1;
+
     // Always update score and allow continued play
     const newScore = gameState.score + score;
     setGameState(prev => ({
       ...prev,
       score: newScore,
+      submissionAttempts: newSubmissionAttempts,
       submitted: {
         // Mark as submitted for all fields that had guesses, regardless of correctness
         wins: wins !== null ? true : prev.submitted.wins,
@@ -179,12 +184,38 @@ export function useGameLogic() {
       },
     }));
 
-    // Only end the game and show results if all answers are correct
-    if (correct === totalGuesses) {
-      // Bonus for perfect score
-      const bonusScore = 50;
-      const finalScore = newScore + bonusScore;
-      const newStreak = gameState.streak + 1;
+    // Check if we should auto-reveal after 5 attempts or if all answers are correct
+    if (correct === totalGuesses || newSubmissionAttempts >= 5) {
+      let finalScore = newScore;
+      let newStreak = gameState.streak;
+
+      // Only give bonus points and increment streak if all answers are correct
+      if (correct === totalGuesses) {
+        // Bonus for perfect score
+        const bonusScore = 50;
+        finalScore = newScore + bonusScore;
+        newStreak = gameState.streak + 1;
+      } else {
+        // Auto-reveal after 5 attempts - reset streak but don't penalize score
+        newStreak = 0;
+        
+        // Reveal all correct answers
+        setGameState(prev => ({
+          ...prev,
+          guesses: {
+            wins: prev.currentRecord?.wins || null,
+            season: prev.currentRecord?.season || null,
+            teamName: prev.currentTeam?.name || null,
+            playoffResult: prev.currentRecord?.playoffResult || null,
+          },
+          submitted: {
+            wins: true,
+            season: true,
+            teamName: true,
+            playoffResult: true,
+          },
+        }));
+      }
 
       setGameState(prev => ({
         ...prev,
