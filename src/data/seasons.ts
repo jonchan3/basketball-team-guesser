@@ -351,8 +351,7 @@ export const COMPACT_SEASON_RECORDS = [
       ['Michael Jordan', 'SG', true], ['Scottie Pippen', 'SF', true], ['Dennis Rodman', 'PF', true],
       ['Steve Kerr', 'PG'], ['Luc Longley', 'C'], ['Toni Kukoc', 'SF'],
       ['Ron Harper', 'PG'], ['Bill Wennington', 'C'], ['Jud Buechler', 'SF'],
-      ['Scott Burrell', 'SF'], ['Randy Brown', 'PG'], ['Dickey Simpkins', 'PF'],
-      ['Robert Parish', 'C'], ['Keith Booth', 'SF'], ['Rusty LaRue', 'PG']
+      ['Scott Burrell', 'SF'], ['Randy Brown', 'PG'], ['Dickey Simpkins', 'PF'], ['Keith Booth', 'SF'], ['Rusty LaRue', 'PG']
     ]
   },
   {
@@ -484,7 +483,7 @@ export const COMPACT_SEASON_RECORDS = [
       ['Keith Van Horn', 'PF'], ['Todd MacCulloch', 'C'], ['Kerry Kittles', 'SG'],
       ['Lucious Harris', 'SG'], ['Aaron Williams', 'PF'], ['Brian Scalabrine', 'PF'],
       ['Jason Collins', 'C'], ['Rodney Rogers', 'SF'], ['Brandon Armstrong', 'PG'],
-      ['Tamar Slay', 'SG'], ['Dikembe Mutombo', 'C'], ['Soumaila Samake', 'C']
+      ['Tamar Slay', 'SG'], ['Soumaila Samake', 'C']
     ]
   },
   {
