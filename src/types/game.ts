@@ -44,6 +44,12 @@ export interface GameState {
     teamName: string | null;
     playoffResult: PlayoffResult | null;
   };
+  finalGuesses: {
+    wins: number | null;
+    season: string | null;
+    teamName: string | null;
+    playoffResult: PlayoffResult | null;
+  } | null;
   hints: {
     wins: string | null;
     season: string | null;

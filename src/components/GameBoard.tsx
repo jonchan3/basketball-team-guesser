@@ -98,12 +98,40 @@ export default function GameBoard() {
     
     const { wins, season, teamName, playoffResult } = gameState.guesses;
     const { currentRecord, currentTeam } = gameState;
-    
+
     return {
-      wins: wins !== null && wins === currentRecord.wins,
-      season: season !== null && normalizeSeason(season) === normalizeSeason(currentRecord.season),
-      teamName: teamName === currentTeam.name,
-      playoffResult: playoffResult === currentRecord.playoffResult,
+      wins: wins !== null ? wins === currentRecord.wins : undefined,
+      season: season !== null ? normalizeSeason(season) === normalizeSeason(currentRecord.season) : undefined,
+      teamName: teamName !== null ? teamName === currentTeam.name : undefined,
+      playoffResult: playoffResult !== null ? playoffResult === currentRecord.playoffResult : undefined,
+    };
+  };
+
+  // Get the guesses to display (either current guesses or final guesses for lost games)
+  const getDisplayGuesses = () => {
+    if (gameState.finalGuesses && showResults) {
+      return gameState.finalGuesses;
+    }
+    return gameState.guesses;
+  };
+
+  // Check correctness based on the displayed guesses
+  const checkDisplayGuessCorrectness = () => {
+    if (!gameState.currentRecord || !gameState.currentTeam) return {
+      wins: undefined,
+      season: undefined,
+      teamName: undefined,
+      playoffResult: undefined,
+    };
+    
+    const displayGuesses = getDisplayGuesses();
+    const { currentRecord, currentTeam } = gameState;
+
+    return {
+      wins: displayGuesses.wins !== null ? displayGuesses.wins === currentRecord.wins : undefined,
+      season: displayGuesses.season !== null ? normalizeSeason(displayGuesses.season) === normalizeSeason(currentRecord.season) : undefined,
+      teamName: displayGuesses.teamName !== null ? displayGuesses.teamName === currentTeam.name : undefined,
+      playoffResult: displayGuesses.playoffResult !== null ? displayGuesses.playoffResult === currentRecord.playoffResult : undefined,
     };
   };
 
@@ -209,29 +237,29 @@ export default function GameBoard() {
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
                   <div className="bg-black/30 p-4 rounded-lg border border-orange-500/20">
                     <div className="text-sm text-orange-300">Your Guess</div>
-                    <div className={`text-xl font-bold ${getScoreColor(checkGuessCorrectness().wins)}`}>
-                      🎯 {gameState.guesses.wins} wins
+                    <div className={`text-xl font-bold ${getScoreColor(checkDisplayGuessCorrectness().wins)}`}>
+                      {getDisplayGuesses().wins !== null ? `${getDisplayGuesses().wins} wins` : 'No guess'}
                     </div>
                     <div className="text-sm text-orange-300">Actual: {gameState.currentRecord?.wins}</div>
                   </div>
                   <div className="bg-black/30 p-4 rounded-lg border border-orange-500/20">
                     <div className="text-sm text-orange-300">Your Guess</div>
-                    <div className={`text-xl font-bold ${getScoreColor(checkGuessCorrectness().season)}`}>
-                      📅 {gameState.guesses.season}
+                    <div className={`text-xl font-bold ${getScoreColor(checkDisplayGuessCorrectness().season)}`}>
+                      {getDisplayGuesses().season !== null ? getDisplayGuesses().season : 'No guess'}
                     </div>
                     <div className="text-sm text-orange-300">Actual: {gameState.currentRecord?.season}</div>
                   </div>
                   <div className="bg-black/30 p-4 rounded-lg border border-orange-500/20">
                     <div className="text-sm text-orange-300">Your Guess</div>
-                    <div className={`text-xl font-bold ${getScoreColor(checkGuessCorrectness().teamName)}`}>
-                      👥 {gameState.guesses.teamName}
+                    <div className={`text-xl font-bold ${getScoreColor(checkDisplayGuessCorrectness().teamName)}`}>
+                      {getDisplayGuesses().teamName !== null ? getDisplayGuesses().teamName : 'No guess'}
                     </div>
                     <div className="text-sm text-orange-300">Actual: {gameState.currentTeam.name}</div>
                   </div>
                   <div className="bg-black/30 p-4 rounded-lg border border-orange-500/20">
                     <div className="text-sm text-orange-300">Your Guess</div>
-                    <div className={`text-xl font-bold ${getScoreColor(checkGuessCorrectness().playoffResult)}`}>
-                      🏆 {gameState.guesses.playoffResult}
+                    <div className={`text-xl font-bold ${getScoreColor(checkDisplayGuessCorrectness().playoffResult)}`}>
+                      {getDisplayGuesses().playoffResult !== null ? getDisplayGuesses().playoffResult : 'No guess'}
                     </div>
                     <div className="text-sm text-orange-300">Actual: {gameState.currentRecord?.playoffResult}</div>
                   </div>

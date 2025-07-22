@@ -14,6 +14,7 @@ const INITIAL_GAME_STATE: GameState = {
     teamName: null,
     playoffResult: null,
   },
+  finalGuesses: null,
   hints: {
     wins: null,
     season: null,
@@ -73,50 +74,20 @@ export function useGameLogic() {
       score: gameState.score,
       streak: gameState.streak,
       hintsRemaining: 3,
+      finalGuesses: null,
     });
     setShowResults(false);
   };
 
   const makeGuess = (type: keyof GameState['guesses'], value: string | number | null) => {
-    setGameState(prev => {
-      // Check if this field was previously submitted and wrong
-      let wasSubmittedAndWrong = false;
-      if (prev.submitted[type as keyof GameState['submitted']] && prev.currentRecord && prev.currentTeam) {
-        // Check if the previous guess was wrong
-        const prevGuess = prev.guesses[type];
-        if (prevGuess !== null) {
-          let wasCorrect = false;
-          switch (type) {
-            case 'wins':
-              wasCorrect = prevGuess === prev.currentRecord.wins;
-              break;
-            case 'season':
-              wasCorrect = normalizeSeason(prevGuess as string) === normalizeSeason(prev.currentRecord.season);
-              break;
-            case 'teamName':
-              wasCorrect = prevGuess === prev.currentTeam.name;
-              break;
-            case 'playoffResult':
-              wasCorrect = prevGuess === prev.currentRecord.playoffResult;
-              break;
-          }
-          wasSubmittedAndWrong = !wasCorrect;
-        }
-      }
-      
-      return {
-        ...prev,
-        guesses: {
-          ...prev.guesses,
-          [type]: value,
-        },
-        // Reset submitted state for this field if it was wrong and user is typing new answer
-        submitted: wasSubmittedAndWrong ? {
-          ...prev.submitted,
-          [type]: false,
-        } : prev.submitted,
-      };
-    });
+    setGameState(prev => ({
+      ...prev,
+      guesses: {
+        ...prev.guesses,
+        [type]: value,
+      },
+      // Don't reset submitted state when user is typing - let them see previous feedback until they submit again
+    }));
   };
 
   const submitGuesses = () => {
@@ -124,6 +95,14 @@ export function useGameLogic() {
 
     const { wins, season, teamName, playoffResult } = gameState.guesses;
     const { currentRecord, currentTeam } = gameState;
+    
+    // Save the original guesses before we potentially clear them
+    const originalGuesses = {
+      wins,
+      season,
+      teamName,
+      playoffResult,
+    };
     
     let score = 0;
     let correct = 0;
@@ -199,9 +178,15 @@ export function useGameLogic() {
         // Auto-reveal after 5 attempts - reset streak but don't penalize score
         newStreak = 0;
         
-        // Reveal all correct answers
+        // Save player's final guesses before overwriting them
         setGameState(prev => ({
           ...prev,
+          finalGuesses: {
+            wins: originalGuesses.wins,
+            season: originalGuesses.season,
+            teamName: originalGuesses.teamName,
+            playoffResult: originalGuesses.playoffResult,
+          },
           guesses: {
             wins: prev.currentRecord?.wins || null,
             season: prev.currentRecord?.season || null,
@@ -319,6 +304,12 @@ export function useGameLogic() {
     setGameState(prev => ({
       ...prev,
       streak: newStreak,
+      finalGuesses: {
+        wins: prev.guesses.wins,
+        season: prev.guesses.season,
+        teamName: prev.guesses.teamName,
+        playoffResult: prev.guesses.playoffResult,
+      },
       submitted: {
         wins: true,
         season: true,
