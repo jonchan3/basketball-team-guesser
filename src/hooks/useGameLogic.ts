@@ -245,7 +245,7 @@ export function useGameLogic() {
           const rangeSize = 3; // ±3 years range
           const minYear = startYear - rangeSize;
           const maxYear = startYear + rangeSize;
-          hintValue = `${minYear}-${maxYear} (format: YYYY-YY)`;
+          hintValue = `${minYear}-${maxYear}`;
         } else {
           // For single year seasons
           const year = parseInt(seasonYear);
